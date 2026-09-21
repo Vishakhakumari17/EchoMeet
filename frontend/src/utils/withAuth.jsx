@@ -13,10 +13,11 @@ const withAuth = (WrappedComponent ) => {
         }
 
         useEffect(() => {
-            if(!isAuthenticated()) {
-                router("/login")
+            if (!localStorage.getItem("token")) {
+                router("/login");
             }
-        }, [router])
+            // eslint-disable-next-line react-hooks/exhaustive-deps
+        }, []);
 
         return <WrappedComponent {...props} />
     }
