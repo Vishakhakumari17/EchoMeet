@@ -653,7 +653,8 @@ export default function VideoMeetComponent() {
                             </button>
                         </div>
                     </div>
-                </div>
+                    </div>
+                </>
             )}
         </div>
     );
