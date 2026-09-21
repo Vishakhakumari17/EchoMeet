@@ -1,0 +1,90 @@
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 4rem;
+  background-color: var(--glass-bg);
+  border-bottom: 1px solid var(--border-color);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(10px);
+}
+
+.logo {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  cursor: pointer;
+  letter-spacing: -0.5px;
+}
+
+.links {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.themeToggle {
+  background: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.themeToggle:hover {
+  background-color: var(--bg-tertiary);
+}
+
+.navBtn {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.navBtn:hover {
+  color: var(--text-primary);
+  background-color: var(--bg-tertiary);
+}
+
+.primaryBtn {
+  background-color: var(--accent-color);
+  color: var(--text-primary);
+}
+
+.primaryBtn:hover {
+  background-color: var(--accent-hover);
+  color: var(--text-primary);
+}
+
+.dangerBtn {
+  color: var(--danger);
+}
+
+.dangerBtn:hover {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: var(--danger-hover);
+}
+
+@media (max-width: 768px) {
+  .navbar {
+    padding: 1rem 1.5rem;
+  }
+  .links {
+    display: none; /* In a full implementation, add a hamburger menu here */
+  }
+}

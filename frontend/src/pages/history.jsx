@@ -1,88 +1,80 @@
-import React, { useContext, useEffect, useState } from 'react'
-import { AuthContext } from '../contexts/AuthContext'
+import React, { useContext, useEffect, useState } from 'react';
+import { AuthContext } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import Card from '@mui/material/Card';
-import Box from '@mui/material/Box';
-import CardActions from '@mui/material/CardActions';
-import CardContent from '@mui/material/CardContent';
-import Button from '@mui/material/Button';
-import Typography from '@mui/material/Typography';
-import HomeIcon from '@mui/icons-material/Home';
+import styles from './history.module.css';
 
-import { IconButton } from '@mui/material';
 export default function History() {
-
-
     const { getHistoryOfUser } = useContext(AuthContext);
-
-    const [meetings, setMeetings] = useState([])
-
-
-    const routeTo = useNavigate();
+    const [meetings, setMeetings] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchHistory = async () => {
             try {
                 const history = await getHistoryOfUser();
                 setMeetings(history);
-            } catch {
-                // IMPLEMENT SNACKBAR
+            } catch (err) {
+                console.error(err);
+            } finally {
+                setLoading(false);
             }
-        }
+        };
 
         fetchHistory();
-    }, [])
+    }, [getHistoryOfUser]);
 
-    let formatDate = (dateString) => {
-
+    const formatDate = (dateString) => {
         const date = new Date(dateString);
-        const day = date.getDate().toString().padStart(2, "0");
-        const month = (date.getMonth() + 1).toString().padStart(2, "0")
-        const year = date.getFullYear();
-
-        return `${day}/${month}/${year}`
-
-    }
+        return date.toLocaleDateString(undefined, { 
+            weekday: 'long', 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    };
 
     return (
-        <div>
+        <div className={styles.historyContainer}>
+            <div className={styles.header}>
+                <button className={styles.backBtn} onClick={() => navigate('/home')}>
+                    ← Back to Dashboard
+                </button>
+                <h1>Meeting History</h1>
+                <p>View all your past meetings and connections.</p>
+            </div>
 
-            <IconButton onClick={() => {
-                routeTo("/home")
-            }}>
-                <HomeIcon />
-            </IconButton >
-            {
-                (meetings.length !== 0) ? meetings.map((e, i) => {
-                    return (
-
-                        <>
-
-
-                            <Card key={i} variant="outlined">
-
-
-                                <CardContent>
-                                    <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-                                        Code: {e.meetingCode}
-                                    </Typography>
-
-                                    <Typography sx={{ mb: 1.5 }} color="text.secondary">
-                                        Date: {formatDate(e.date)}
-                                    </Typography>
-
-                                </CardContent>
-
-
-                            </Card>
-
-
-                        </>
-                    )
-                }) : <></>
-
-            }
-
+            {loading ? (
+                <div className={styles.loading}>Loading history...</div>
+            ) : meetings.length > 0 ? (
+                <div className={styles.grid}>
+                    {meetings.map((meeting, index) => (
+                        <div key={index} className={styles.card}>
+                            <div className={styles.cardHeader}>
+                                <div className={styles.iconWrapper}>📞</div>
+                                <div>
+                                    <h3>{meeting.meetingCode}</h3>
+                                    <span className={styles.date}>{formatDate(meeting.date)}</span>
+                                </div>
+                            </div>
+                            <div className={styles.cardActions}>
+                                <button 
+                                    className={styles.joinBtn}
+                                    onClick={() => navigate(`/${meeting.meetingCode}`)}
+                                >
+                                    Rejoin Room
+                                </button>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            ) : (
+                <div className={styles.emptyState}>
+                    <p>No meeting history found. Start a new meeting from the dashboard!</p>
+                </div>
+            )}
         </div>
-    )
+    );
 }

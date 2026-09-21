@@ -1,0 +1,210 @@
+.landingContainer {
+  min-height: calc(100vh - 72px);
+  display: flex;
+  flex-direction: column;
+  padding: 0 4rem;
+  overflow-x: hidden;
+}
+
+.heroSection {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 80vh;
+  gap: 4rem;
+}
+
+.heroLeft {
+  flex: 1;
+  max-width: 600px;
+}
+
+.heroTitle {
+  font-size: 4.5rem;
+  font-weight: 700;
+  line-height: 1.1;
+  margin-bottom: 1.5rem;
+  letter-spacing: -1.5px;
+}
+
+.accent {
+  color: var(--accent-color);
+}
+
+.heroSubtitle {
+  font-size: 1.25rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 2.5rem;
+}
+
+.heroActions {
+  display: flex;
+  gap: 1rem;
+}
+
+.btn {
+  padding: 0.875rem 2rem;
+  border-radius: 8px;
+  font-size: 1.125rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+}
+
+.primaryBtn {
+  background-color: var(--accent-color);
+  color: #fff;
+}
+
+.primaryBtn:hover {
+  background-color: var(--accent-hover);
+  transform: translateY(-2px);
+}
+
+.secondaryBtn {
+  background-color: var(--bg-tertiary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+}
+
+.secondaryBtn:hover {
+  background-color: #333;
+  transform: translateY(-2px);
+}
+
+/* Mockups */
+.heroRight {
+  flex: 1;
+  position: relative;
+  height: 500px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.videoCardMockup1, .videoCardMockup2 {
+  background-color: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  position: absolute;
+  transition: transform 0.5s ease;
+}
+
+.videoCardMockup1 {
+  width: 400px;
+  height: 300px;
+  z-index: 2;
+  transform: translateY(-30px) translateX(-40px);
+}
+
+.videoCardMockup2 {
+  width: 350px;
+  height: 250px;
+  z-index: 1;
+  transform: translateY(50px) translateX(80px);
+  filter: brightness(0.8);
+}
+
+.mockupHeader {
+  height: 30px;
+  background-color: #2a2a2a;
+  display: flex;
+  align-items: center;
+  padding: 0 1rem;
+  gap: 0.5rem;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: #555;
+}
+
+.dot:nth-child(1) { background-color: #ff5f56; }
+.dot:nth-child(2) { background-color: #ffbd2e; }
+.dot:nth-child(3) { background-color: #27c93f; }
+
+.mockupBody {
+  position: relative;
+  height: calc(100% - 30px);
+}
+
+.mockupBody img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.mockupLabel {
+  position: absolute;
+  bottom: 1rem;
+  left: 1rem;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+/* Features */
+.featuresSection {
+  padding: 6rem 0;
+  text-align: center;
+}
+
+.featuresSection h2 {
+  font-size: 2.5rem;
+  margin-bottom: 4rem;
+}
+
+.featureGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+}
+
+.featureCard {
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  padding: 2rem;
+  border-radius: 16px;
+  transition: transform 0.3s ease;
+  text-align: left;
+}
+
+.featureCard:hover {
+  transform: translateY(-5px);
+  border-color: var(--accent-color);
+}
+
+.featureIcon {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+.featureCard h3 {
+  font-size: 1.25rem;
+  margin-bottom: 0.75rem;
+}
+
+.featureCard p {
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+@media (max-width: 1024px) {
+  .heroTitle { font-size: 3.5rem; }
+  .heroRight { display: none; }
+}
+
+@media (max-width: 768px) {
+  .landingContainer { padding: 0 1.5rem; }
+  .heroTitle { font-size: 2.5rem; }
+  .heroActions { flex-direction: column; }
+}

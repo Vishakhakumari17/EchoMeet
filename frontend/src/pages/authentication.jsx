@@ -1,175 +1,142 @@
-import * as React from 'react';
-import Avatar from '@mui/material/Avatar';
-import Button from '@mui/material/Button';
-import CssBaseline from '@mui/material/CssBaseline';
-import TextField from '@mui/material/TextField';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
-import Link from '@mui/material/Link';
-import Paper from '@mui/material/Paper';
-import Box from '@mui/material/Box';
-import Grid from '@mui/material/Grid';
-import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
-import Typography from '@mui/material/Typography';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
+import React, { useState, useContext, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../contexts/AuthContext';
-import { Snackbar } from '@mui/material';
-
-
-
-// TODO remove, this demo shouldn't need to reset the theme.
-
-const defaultTheme = createTheme();
+import styles from './authentication.module.css';
 
 export default function Authentication() {
+    const location = useLocation();
+    const navigate = useNavigate();
+    const { handleRegister, handleLogin } = useContext(AuthContext);
 
-    
+    const [isLogin, setIsLogin] = useState(location.pathname !== '/register');
+    const [name, setName] = useState('');
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
+    const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
 
-    const [username, setUsername] = React.useState();
-    const [password, setPassword] = React.useState();
-    const [name, setName] = React.useState();
-    const [error, setError] = React.useState();
-    const [message, setMessage] = React.useState();
+    useEffect(() => {
+        setIsLogin(location.pathname !== '/register');
+    }, [location.pathname]);
 
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setError('');
+        setLoading(true);
 
-    const [formState, setFormState] = React.useState(0);
-
-    const [open, setOpen] = React.useState(false)
-
-
-    const { handleRegister, handleLogin } = React.useContext(AuthContext);
-
-    let handleAuth = async () => {
         try {
-            if (formState === 0) {
-
-                let result = await handleLogin(username, password)
-
-
-            }
-            if (formState === 1) {
-                let result = await handleRegister(name, username, password);
-                console.log(result);
-                setUsername("");
-                setMessage(result);
-                setOpen(true);
-                setError("")
-                setFormState(0)
-                setPassword("")
+            if (isLogin) {
+                await handleLogin(username, password);
+                // AuthContext handles redirect to /home on success
+            } else {
+                if (!name) {
+                    setError('Full Name is required');
+                    setLoading(false);
+                    return;
+                }
+                await handleRegister(name, username, password);
+                // If successful, switch to login
+                setIsLogin(true);
+                setPassword('');
+                navigate('/login');
             }
         } catch (err) {
-
-            console.log(err);
-            let message = (err.response.data.message);
-            setError(message);
+            console.error(err);
+            if (err.response && err.response.data && err.response.data.message) {
+                setError(err.response.data.message);
+            } else {
+                setError(`An error occurred: ${err.message || 'Please try again.'}`);
+            }
+        } finally {
+            setLoading(false);
         }
-    }
-
+    };
 
     return (
-        <ThemeProvider theme={defaultTheme}>
-            <Grid container component="main" sx={{ height: '100vh' }}>
-                <CssBaseline />
-                <Grid
-                    item
-                    xs={false}
-                    sm={4}
-                    md={7}
-                    sx={{
-                        backgroundImage: 'url(https://source.unsplash.com/random?wallpapers)',
-                        backgroundRepeat: 'no-repeat',
-                        backgroundColor: (t) =>
-                            t.palette.mode === 'light' ? t.palette.grey[50] : t.palette.grey[900],
-                        backgroundSize: 'cover',
-                        backgroundPosition: 'center',
-                    }}
-                />
-                <Grid item xs={12} sm={8} md={5} component={Paper} elevation={6} square>
-                    <Box
-                        sx={{
-                            my: 8,
-                            mx: 4,
-                            display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: 'center',
-                        }}
-                    >
-                        <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
-                            <LockOutlinedIcon />
-                        </Avatar>
+        <div className={styles.authContainer}>
+            <div className={styles.authLeft}>
+                <div className={styles.brandContainer} onClick={() => navigate('/')}>
+                    <h2>EchoMeet</h2>
+                </div>
+                <div className={styles.visualContent}>
+                    <h1>Your people are just one call away.</h1>
+                    <p>Join the next generation of video communication.</p>
+                </div>
+            </div>
+            
+            <div className={styles.authRight}>
+                <div className={styles.formCard}>
+                    <h2>{isLogin ? 'Welcome back' : 'Create an account'}</h2>
+                    <p className={styles.subtitle}>
+                        {isLogin ? 'Please enter your details to sign in.' : 'Start your journey with EchoMeet.'}
+                    </p>
 
+                    <form onSubmit={handleSubmit} className={styles.form}>
+                        {!isLogin && (
+                            <div className={styles.inputGroup}>
+                                <label>Full Name</label>
+                                <input 
+                                    type="text" 
+                                    value={name} 
+                                    onChange={(e) => setName(e.target.value)} 
+                                    placeholder="John Doe"
+                                    required 
+                                />
+                            </div>
+                        )}
 
-                        <div>
-                            <Button variant={formState === 0 ? "contained" : ""} onClick={() => { setFormState(0) }}>
-                                Sign In
-                            </Button>
-                            <Button variant={formState === 1 ? "contained" : ""} onClick={() => { setFormState(1) }}>
-                                Sign Up
-                            </Button>
+                        <div className={styles.inputGroup}>
+                            <label>Username</label>
+                            <input 
+                                type="text" 
+                                value={username} 
+                                onChange={(e) => setUsername(e.target.value)} 
+                                placeholder="johndoe123"
+                                required 
+                            />
                         </div>
 
-                        <Box component="form" noValidate sx={{ mt: 1 }}>
-                            {formState === 1 ? <TextField
-                                margin="normal"
-                                required
-                                fullWidth
-                                id="username"
-                                label="Full Name"
-                                name="username"
-                                value={name}
-                                autoFocus
-                                onChange={(e) => setName(e.target.value)}
-                            /> : <></>}
+                        <div className={styles.inputGroup}>
+                            <label>Password</label>
+                            <div className={styles.passwordWrapper}>
+                                <input 
+                                    type={showPassword ? "text" : "password"} 
+                                    value={password} 
+                                    onChange={(e) => setPassword(e.target.value)} 
+                                    placeholder="••••••••"
+                                    required 
+                                />
+                                <button 
+                                    type="button" 
+                                    className={styles.eyeBtn}
+                                    onClick={() => setShowPassword(!showPassword)}
+                                >
+                                    {showPassword ? 'Hide' : 'Show'}
+                                </button>
+                            </div>
+                        </div>
 
-                            <TextField
-                                margin="normal"
-                                required
-                                fullWidth
-                                id="username"
-                                label="Username"
-                                name="username"
-                                value={username}
-                                autoFocus
-                                onChange={(e) => setUsername(e.target.value)}
+                        {error && <div className={styles.errorMessage}>{error}</div>}
 
-                            />
-                            <TextField
-                                margin="normal"
-                                required
-                                fullWidth
-                                name="password"
-                                label="Password"
-                                value={password}
-                                type="password"
-                                onChange={(e) => setPassword(e.target.value)}
+                        <button 
+                            type="submit" 
+                            className={styles.submitBtn} 
+                            disabled={loading}
+                        >
+                            {loading ? 'Please wait...' : (isLogin ? 'Log In' : 'Create Account')}
+                        </button>
+                    </form>
 
-                                id="password"
-                            />
-
-                            <p style={{ color: "red" }}>{error}</p>
-
-                            <Button
-                                type="button"
-                                fullWidth
-                                variant="contained"
-                                sx={{ mt: 3, mb: 2 }}
-                                onClick={handleAuth}
-                            >
-                                {formState === 0 ? "Login " : "Register"}
-                            </Button>
-
-                        </Box>
-                    </Box>
-                </Grid>
-            </Grid>
-
-            <Snackbar
-
-                open={open}
-                autoHideDuration={4000}
-                message={message}
-            />
-
-        </ThemeProvider>
+                    <div className={styles.switchMode}>
+                        {isLogin ? (
+                            <p>Don't have an account? <span onClick={() => navigate('/register')}>Sign up</span></p>
+                        ) : (
+                            <p>Already have an account? <span onClick={() => navigate('/login')}>Log in</span></p>
+                        )}
+                    </div>
+                </div>
+            </div>
+        </div>
     );
 }

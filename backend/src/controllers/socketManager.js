@@ -4,6 +4,7 @@ import { Server } from "socket.io"
 let connections = {}
 let messages = {}
 let timeOnline = {}
+let roomHosts = {}
 
 export const connectToSocket = (server) => {
     const io = new Server(server, {
@@ -20,31 +21,51 @@ export const connectToSocket = (server) => {
 
         console.log("SOMETHING CONNECTED")
 
-        socket.on("join-call", (path) => {
-
+        socket.on("request-join-call", (path, username) => {
             if (connections[path] === undefined) {
-                connections[path] = []
+                connections[path] = [];
             }
-            connections[path].push(socket.id)
+            
+            // First person to join becomes the host
+            if (!roomHosts[path] || connections[path].length === 0) {
+                roomHosts[path] = socket.id;
+                executeJoinCall(path, socket.id);
+            } else {
+                // Not host, ask host for admission
+                io.to(roomHosts[path]).emit("guest-requesting-join", { socketId: socket.id, username: username });
+            }
+        });
 
-            timeOnline[socket.id] = new Date();
+        socket.on("admit-guest", (guestSocketId, path, admit) => {
+            if (roomHosts[path] === socket.id) { // Only host can admit
+                if (admit) {
+                    io.to(guestSocketId).emit("join-accepted");
+                    executeJoinCall(path, guestSocketId);
+                } else {
+                    io.to(guestSocketId).emit("join-denied");
+                }
+            }
+        });
 
-            // connections[path].forEach(elem => {
-            //     io.to(elem)
-            // })
+        // Original join logic extracted to a function
+        const executeJoinCall = (path, sckId) => {
+            if (!connections[path].includes(sckId)) {
+                connections[path].push(sckId);
+            }
+
+            timeOnline[sckId] = new Date();
 
             for (let a = 0; a < connections[path].length; a++) {
-                io.to(connections[path][a]).emit("user-joined", socket.id, connections[path])
+                io.to(connections[path][a]).emit("user-joined", sckId, connections[path]);
             }
 
             if (messages[path] !== undefined) {
                 for (let a = 0; a < messages[path].length; ++a) {
-                    io.to(socket.id).emit("chat-message", messages[path][a]['data'],
-                        messages[path][a]['sender'], messages[path][a]['socket-id-sender'])
+                    io.to(sckId).emit("chat-message", messages[path][a]['data'],
+                        messages[path][a]['sender'], messages[path][a]['socket-id-sender']);
                 }
             }
-
-        })
+        };
 
         socket.on("signal", (toId, message) => {
             io.to(toId).emit("signal", socket.id, message);
@@ -101,7 +122,11 @@ export const connectToSocket = (server) => {
 
 
                         if (connections[key].length === 0) {
-                            delete connections[key]
+                            delete connections[key];
+                            delete roomHosts[key];
+                        } else if (roomHosts[key] === socket.id) {
+                            // Assign new host to the next person in line
+                            roomHosts[key] = connections[key][0];
                         }
                     }
                 }
