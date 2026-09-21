@@ -24,8 +24,16 @@ function HomeComponent() {
 
     let handleJoinVideoCall = async () => {
         if (!meetingCode) return;
-        await addToUserHistory(meetingCode);
-        navigate(`/${meetingCode}`);
+        
+        let finalCode = meetingCode.trim();
+        // If user pasted a full URL, extract just the code at the end
+        if (finalCode.includes('/')) {
+            const parts = finalCode.split('/');
+            finalCode = parts[parts.length - 1];
+        }
+
+        await addToUserHistory(finalCode);
+        navigate(`/${finalCode}`);
     };
 
     let generateMeetingId = () => {
