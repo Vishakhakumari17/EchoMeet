@@ -72,6 +72,15 @@ export default function VideoMeetComponent() {
                     .then((stream) => { })
                     .catch((e) => console.log(e))
             }
+        } else {
+            // Stop screen sharing tracks explicitly to trigger cleanup
+            try {
+                let tracks = localVideoref.current.srcObject.getTracks()
+                tracks.forEach(track => track.stop())
+            } catch (e) { console.log(e) }
+            
+            // Re-acquire webcam
+            getUserMedia();
         }
     }
 
