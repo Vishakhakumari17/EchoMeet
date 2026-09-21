@@ -10,6 +10,7 @@ import MicOffIcon from '@mui/icons-material/MicOff'
 import ScreenShareIcon from '@mui/icons-material/ScreenShare';
 import StopScreenShareIcon from '@mui/icons-material/StopScreenShare'
 import ChatIcon from '@mui/icons-material/Chat'
+import FullscreenIcon from '@mui/icons-material/Fullscreen'
 import server from '../environment';
 
 const server_url = server;
@@ -51,6 +52,27 @@ export default function VideoMeetComponent() {
     const videoRef = useRef([]);
 
     let [videos, setVideos] = useState([])
+
+    const toggleFullScreen = (e) => {
+        const videoElement = e.target.closest(`.${styles.videoWrapper}`).querySelector('video');
+        if (!document.fullscreenElement) {
+            if (videoElement.requestFullscreen) {
+                videoElement.requestFullscreen();
+            } else if (videoElement.webkitRequestFullscreen) {
+                videoElement.webkitRequestFullscreen();
+            } else if (videoElement.msRequestFullscreen) {
+                videoElement.msRequestFullscreen();
+            }
+        } else {
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            } else if (document.webkitExitFullscreen) {
+                document.webkitExitFullscreen();
+            } else if (document.msExitFullscreen) {
+                document.msExitFullscreen();
+            }
+        }
+    };
 
     // TODO
     // if(isChrome() === false) {
@@ -561,6 +583,9 @@ export default function VideoMeetComponent() {
                             <div className={styles.videoWrapper}>
                                 <video className={styles.meetUserVideo} ref={localVideoref} autoPlay muted></video>
                                 <div className={styles.videoLabel}>You</div>
+                                <button className={styles.fullScreenBtn} onClick={toggleFullScreen} title="Fullscreen">
+                                    <FullscreenIcon />
+                                </button>
                                 <div className={styles.statusIcons}>
                                     {!audio && <div className={styles.statusIcon}>🔇</div>}
                                     {!video && <div className={styles.statusIcon}>🚫📹</div>}
@@ -580,6 +605,9 @@ export default function VideoMeetComponent() {
                                         autoPlay
                                     ></video>
                                     <div className={styles.videoLabel}>Participant</div>
+                                    <button className={styles.fullScreenBtn} onClick={toggleFullScreen} title="Fullscreen">
+                                        <FullscreenIcon />
+                                    </button>
                                 </div>
                             ))}
                         </div>
