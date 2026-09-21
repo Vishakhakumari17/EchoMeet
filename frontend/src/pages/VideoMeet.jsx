@@ -279,8 +279,11 @@ export default function VideoMeetComponent() {
         socketRef.current.on('signal', gotMessageFromServer)
 
         socketRef.current.on('connect', () => {
-            // Emitting request-join-call instead of join-call
-            socketRef.current.emit('request-join-call', window.location.href, username)
+            // Use just the meeting code as the room path so users on different IPs/domains join the exact same room
+            const urlParts = window.location.href.split('/');
+            const roomCode = urlParts[urlParts.length - 1].split('?')[0]; // Extract just the code at the end
+            
+            socketRef.current.emit('request-join-call', roomCode, username)
             socketIdRef.current = socketRef.current.id
             setIsWaitingForAdmit(true);
 
@@ -461,7 +464,9 @@ export default function VideoMeetComponent() {
     }
 
     const handleAdmit = (request, admit) => {
-        socketRef.current.emit("admit-guest", request.socketId, window.location.href, admit);
+        const urlParts = window.location.href.split('/');
+        const roomCode = urlParts[urlParts.length - 1].split('?')[0];
+        socketRef.current.emit("admit-guest", request.socketId, roomCode, admit);
         setPendingRequests(prev => prev.filter(r => r.socketId !== request.socketId));
     };
 
