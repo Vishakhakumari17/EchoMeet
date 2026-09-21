@@ -303,6 +303,7 @@ export default function VideoMeetComponent() {
                 }
                 
                 clients.forEach((socketListId) => {
+                    if (connections[socketListId] !== undefined) return;
 
                     connections[socketListId] = new RTCPeerConnection(peerConfigConnections)
                     // Wait for their ice candidate       
@@ -495,14 +496,6 @@ export default function VideoMeetComponent() {
                         </div>
                     </div>
                 </div>
-            ) : isWaitingForAdmit ? (
-                <div className={styles.waitingRoom}>
-                    <div className={styles.waitingCard}>
-                        <h2>Waiting for host</h2>
-                        <p>The meeting host will let you in soon.</p>
-                        <div className={styles.loader}></div>
-                    </div>
-                </div>
             ) : joinDenied ? (
                 <div className={styles.waitingRoom}>
                     <div className={styles.waitingCard}>
@@ -514,7 +507,17 @@ export default function VideoMeetComponent() {
                     </div>
                 </div>
             ) : (
-                <div className={styles.activeCallContainer}>
+                <>
+                    {isWaitingForAdmit && (
+                        <div className={styles.waitingRoom} style={{position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 999}}>
+                            <div className={styles.waitingCard}>
+                                <h2>Waiting for host</h2>
+                                <p>The meeting host will let you in soon.</p>
+                                <div className={styles.loader}></div>
+                            </div>
+                        </div>
+                    )}
+                    <div className={styles.activeCallContainer}>
                     <div className={styles.topBar}>
                         <div className={styles.logo}>EchoMeet</div>
                         <div className={styles.meetingInfo}>
